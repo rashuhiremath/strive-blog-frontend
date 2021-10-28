@@ -8,18 +8,31 @@ import "./styles.css";
 class Blog extends Component {
   state = {
     blog: {},
-    loading: true,
+    isLoading: true,
+    error:false
   };
-  componentDidMount() {
-    const { id } = this.props.match.params;
-    console.log(posts);
-    const blog = posts.find((post) => post._id.toString() === id);
-    if (blog) {
-      this.setState({ blog, loading: false });
-    } else {
-      this.props.history.push("/404");
+
+  id = this.props
+  handleFetch = async (id) => {
+    try {
+      const response = await fetch("http://localhost:3002/blogs/"+id);
+
+      if (response.ok) {
+        const blog = await response.json();
+        console.log(blog)
+        console.log(this.state)
+        this.setState({ blog, isLoadong: false });
+      } else {
+      }
+    } catch (error) {
+      this.setState({ isLoading: false, error: error.message });
     }
-  }
+  };
+  componentDidMount = () => {
+    const { id } = this.props.match.params;
+    this.handleFetch(id);
+  };
+
 
   render() {
     const { loading, blog } = this.state;
@@ -29,23 +42,23 @@ class Blog extends Component {
       return (
         <div className="blog-details-root">
           <Container>
-            <Image className="blog-details-cover" src={blog.cover} fluid />
-            <h1 className="blog-details-title">{blog.title}</h1>
+            <Image className="blog-details-cover" src={blog.avatar} fluid />
+            <h1 className="blog-details-title">{blog.name}</h1>
 
             <div className="blog-details-container">
               <div className="blog-details-author">
-                <BlogAuthor {...blog.author} />
+                {/* <BlogAuthor {...blog.author} /> */}
               </div>
               <div className="blog-details-info">
                 <div>{blog.createdAt}</div>
-                <div>{`${blog.readTime.value} ${blog.readTime.unit} read`}</div>
+                {/* <div>{`${blog.readTime.value} ${blog.readTime.unit} read`}</div> */}
                 <div style={{marginTop:20}}>
                   <BlogLike defaultLikes={["123"]} onChange={console.log}/>
                 </div>
               </div>
             </div>
 
-            <div dangerouslySetInnerHTML={{ __html: blog.content }}></div>
+            {/* <div dangerouslySetInnerHTML={{ __html: blog.content }}></div> */}
           </Container>
         </div>
       );

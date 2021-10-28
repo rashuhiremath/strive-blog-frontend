@@ -4,42 +4,92 @@ import ReactQuill from "react-quill";
 import { Container, Form, Button } from "react-bootstrap";
 import "./styles.css";
 export default class NewBlogPost extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { text: "" };
-    this.handleChange = this.handleChange.bind(this);
-  }
+  
+  state = {
+    avatar: null,
+    body: {
+      name: "",
+    },
+  };
 
-  handleChange(value) {
-    this.setState({ text: value });
-  }
+  addTheNewBlog = async (id) => {
+    let formData = new FormData();
+    formData.append("post", this.state.avatar);
+
+
+    try {
+      const response = await fetch("http://localhost:3002/blogs", {
+        method: "POST",
+        body: JSON.stringify(this.state.body),
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+       
+        
+      } );
+      console.log(response)
+
+      if (response.ok) {
+        const  imageUpload = await fetch(
+          `http://localhost:3002/blogs/${id}/uploadSingle`,
+          {
+            body: formData,
+            method: "POST",
+          }  
+        )
+       
+        alert("posted");
+        const postData = await imageUpload.json();
+        console.log("data of image" , postData);
+
+        console.log("here my new data", formData.getAll("post"));
+        
+      } else {
+        console.log("something went wrong");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  handleSubmit = (event) => {
+    event.preventDefault();
+    this. addTheNewBlog();
+  };
+
+  handleChange = (event) => {
+    this.setState({ ...this.state, body: { name: event.target.value } });
+  };
 
   render() {
     return (
       <Container className="new-blog-container">
-        <Form className="mt-5">
+        <Form onSubmit={this.handleSubmit} className="mt-5">
           <Form.Group controlId="blog-form" className="mt-3">
-            <Form.Label>Title</Form.Label>
-            <Form.Control size="lg" placeholder="Title" />
-          </Form.Group>
-          <Form.Group controlId="blog-category" className="mt-3">
-            <Form.Label>Category</Form.Label>
-            <Form.Control size="lg" as="select">
-              <option>Category1</option>
-              <option>Category2</option>
-              <option>Category3</option>
-              <option>Category4</option>
-              <option>Category5</option>
-            </Form.Control>
-          </Form.Group>
-          <Form.Group controlId="blog-content" className="mt-3">
-            <Form.Label>Blog Content</Form.Label>
-            <ReactQuill
-              value={this.state.text}
+            <Form.Label>name</Form.Label>
+            <Form.Control
+              size="lg"
+              type="text"
+              placeholder="name"
+             
+              value={this.state.name}
               onChange={this.handleChange}
-              className="new-blog-content"
             />
           </Form.Group>
+{/*           
+          <Form.Group controlId="blog-form" className="mt-3">
+            <Form.Label>surname</Form.Label>
+            <Form.Control size="lg" placeholder="surname" type="text" value={this.state.text}
+              onChange={this.handleChange}/>
+          </Form.Group> */}
+          <input
+            type="file"
+            onChange={(e) =>
+              this.setState({ ...this.state, avatar: e.target.files[0] })
+            }
+            accept="image/png, image/jpeg"
+          />
           <Form.Group className="d-flex mt-3 justify-content-end">
             <Button type="reset" size="lg" variant="outline-dark">
               Reset

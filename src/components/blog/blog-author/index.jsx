@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Row, Col, Image } from "react-bootstrap";
 import "./styles.css";
 export default class BlogAuthor extends Component {
+  
   render() {
     const { name, avatar } = this.props;
     return (
